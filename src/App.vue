@@ -9,7 +9,7 @@
       <div class="main">
         <div class="logo">
           <img src="./assets/favicon.ico">
-          <span>Han Analytics</span>
+          <span>Web Analytics</span>
         </div>
         <h2>Web分析</h2>
       </div>
