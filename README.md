@@ -4,10 +4,6 @@
 
 · 域名、服务器、数据库 通通都不用! 托管在 Cloudflare Pages 上即可快速部署网站分析仪表板。
 
-### 页面截图
-
-![Han-Analytics](https://i0.wp.com/uxiaohan.github.io/v2/2024/09/1727007937.webp)
-![Han-Analytics](https://i0.wp.com/uxiaohan.github.io/v2/2024/09/1726993735.webp)
 
 ### 部署
 
@@ -20,20 +16,4 @@
 - 部署成功后，首次打开页面没有数据，请尽快集成到自己的网站并出现有效访问后，再次打开页面即可看到数据！
 - 新增 `密码访问` 及 `网站白名单`，在 `wrangler.toml` 文件中配置，开启密码后，输入密码可访问（默认无需密码），网站白名单功能，加白的网站才可计入统计（默认任意网站都可统计）
 
-### 集成使用
 
-```js
-// 在网站底部插入以下代码即可集成网站分析仪表板
-<script defer src="https://xxxxxx.pages.dev/tracker.min.js" data-website-id="自定义网站唯一标识"></script>
-```
-
-### 数据问题
-
-数据问题一般是由于 Cloudflare Analytics Engine 无法访问网站导致的，请确保网站可以正常访问，并且 Cloudflare Analytics Engine 已经开启。
-
-使用 Cloudflare Analytics Engine 数据集，它完全通过 HTTP 使用 Cloudflare 的 API 进行通信，数据完全来源于 Cloudflare Analaytics Engine 数据集中读取
-Cloudflare Analytics Engine 使用抽样技术，以可承受的规模化方式实现大量数据提取/查询（这类似于大多数其他分析工具，请参阅Google Analytics 上的抽样）。您可以在此处详细了解抽样技术如何与 CF AE 配合使用。
-
-### 使用说明
-
-https://www.vvhan.com/article/han-analytics.html
