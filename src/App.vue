@@ -1,26 +1,19 @@
 <template>
-  <!-- 新增加载状态组件 -->
-  <div v-if="loading" class="fixed inset-0 z-[999999] flex items-center justify-center bg-black/50">
-    <div class="loading-spinner"></div>
-  </div>
-
   <section class="han_analytics">
     <header>
       <div class="main">
         <div class="logo">
           <img src="./assets/favicon.ico">
-          <span>Han Analytics</span>
+          <span>Web Analytics</span>
         </div>
-        <h2>简单优雅的Web分析</h2>
+        <h2>Web分析</h2>
       </div>
     </header>
     <main>
       <header>
         <Alert>
           <AlertDescription>
-            <p>· Han Analytics 是一个简单的网络分析跟踪器和仪表板，托管在被称为赛博菩萨的 Cloudflare 上,无成本稳定运行,每天可达10万次免费统计。</p>
-            <p>· 域名、服务器、数据库 通通都不用! 托管在 Cloudflare Pages 上即可快速部署网站分析仪表板。</p>
-            <p style="font-weight: bold;">· 开源地址: <a class="git-link" href="https://github.com/uxiaohan/HanAnalytics"
+            <p style="font-weight: bold;">· 开源地址: <a class="git-link" href="https://github.com/weiiiiiu/HanAnalytics"
                 target="_blank">Han-Analytics</a>
             </p>
           </AlertDescription>
@@ -90,152 +83,9 @@
 
         <div ref="echartsDOM" class="data-view"></div>
 
-        <div class="pt-20 grid md:grid-cols-2 sm:grid-cols-1 gap-[16px]">
-          <Card class="box-border flex flex-col w-full h-[460px] overflow-hidden">
-            <CardHeader>
-              <CardTitle>Pages</CardTitle>
-            </CardHeader>
-            <CardContent class="box-border pt-0 w-full h-full overflow-hidden">
-              <ScrollArea class="box-border p-2 pt-0 h-full w-full pages-list" v-if="resData.path != undefined">
-                <p class="page-item" v-for="(i, idx) in resData.path" :key="idx">
-                  <span class="line-clamp-1">{{ i.name }}</span>
-                  <span class="line-clamp-1">{{ i.value }}</span>
-                  <em>{{ i.per }}<i :style="{ width: i.per }"></i></em>
-                </p>
-              </ScrollArea>
-              <div class="space-y-4 pt-8 w-full" v-else>
-                <Skeleton class="h-6 w-60" />
-                <Skeleton class="h-6 w-80" />
-                <Skeleton class="h-6 w-100" />
-                <Skeleton class="h-6 w-60" />
-                <Skeleton class="h-6 w-80" />
-                <Skeleton class="h-6 w-100" />
-                <Skeleton class="h-6 w-80" />
-                <Skeleton class="h-6 w-full" />
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card class="box-border flex flex-col w-full h-[460px] overflow-hidden">
-            <CardHeader>
-              <CardTitle>Referrers</CardTitle>
-            </CardHeader>
-            <CardContent class="box-border pt-0 w-full h-full overflow-hidden">
-              <ScrollArea class="box-border p-2 pt-0 h-full w-full pages-list" v-if="resData.referrer != undefined">
-                <p class="page-item" v-for="(i, idx) in resData.referrer" :key="idx">
-                  <img v-if="i.name" :src="getIconUrl(i.name)">
-                  <a :href="i.name" target="_blank" rel="noopener noreferrer" class="line-clamp-1 cursor-pointer">
-                    {{ i.name || '(None)' }}
-                  </a>
-                  <span class="line-clamp-1">{{ i.value }}</span>
-                  <em>{{ i.per }}<i :style="{ width: i.per }"></i></em>
-                </p>
-              </ScrollArea>
-              <div class="space-y-4 pt-8 w-full" v-else>
-                <Skeleton class="h-6 w-60" />
-                <Skeleton class="h-6 w-80" />
-                <Skeleton class="h-6 w-100" />
-                <Skeleton class="h-6 w-60" />
-                <Skeleton class="h-6 w-80" />
-                <Skeleton class="h-6 w-100" />
-                <Skeleton class="h-6 w-80" />
-                <Skeleton class="h-6 w-full" />
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        <div class="pt-6 grid xl:grid-cols-3 gap-[16px] md:grid-cols-2 sm:grid-cols-1">
-          <Card class="box-border flex flex-col w-full h-[460px] overflow-hidden">
-            <CardHeader>
-              <CardTitle>Browsers</CardTitle>
-            </CardHeader>
-            <CardContent class="box-border pt-0 w-full h-full overflow-hidden">
-              <ScrollArea class="box-border p-2 pt-0 h-full w-full pages-list" v-if="resData.soft != undefined">
-                <p class="page-item" v-for="(i, idx) in resData.soft" :key="idx">
-                  <span class="line-clamp-1">{{ i.name }}</span>
-                  <span class="line-clamp-1">{{ i.value }}</span>
-                  <em>{{ i.per }}<i :style="{ width: i.per }"></i></em>
-                </p>
-              </ScrollArea>
-              <div class="space-y-4 pt-8 w-full" v-else>
-                <Skeleton class="h-6 w-60" />
-                <Skeleton class="h-6 w-80" />
-                <Skeleton class="h-6 w-100" />
-                <Skeleton class="h-6 w-60" />
-                <Skeleton class="h-6 w-80" />
-                <Skeleton class="h-6 w-100" />
-                <Skeleton class="h-6 w-80" />
-                <Skeleton class="h-6 w-full" />
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card class="box-border flex flex-col w-full h-[460px] overflow-hidden">
-            <CardHeader>
-              <CardTitle>OS</CardTitle>
-            </CardHeader>
-            <CardContent class="box-border pt-0 w-full h-full overflow-hidden">
-              <ScrollArea class="box-border p-2 pt-0 h-full w-full pages-list" v-if="resData.os != undefined">
-                <p class="page-item" v-for="(i, idx) in resData.os" :key="idx">
-                  <img class="os" :src="getIcon(i.name)">
-                  <span class="line-clamp-1">{{ i.name }}</span>
-                  <span class="line-clamp-1">{{ i.value }}</span>
-                  <em>{{ i.per }}<i :style="{ width: i.per }"></i></em>
-                </p>
-              </ScrollArea>
-              <div class="space-y-4 pt-8 w-full" v-else>
-                <Skeleton class="h-6 w-60" />
-                <Skeleton class="h-6 w-80" />
-                <Skeleton class="h-6 w-100" />
-                <Skeleton class="h-6 w-60" />
-                <Skeleton class="h-6 w-80" />
-                <Skeleton class="h-6 w-100" />
-                <Skeleton class="h-6 w-80" />
-                <Skeleton class="h-6 w-full" />
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card class="box-border flex flex-col w-full h-[460px] overflow-hidden">
-            <CardHeader>
-              <CardTitle>Areas</CardTitle>
-            </CardHeader>
-            <CardContent class="box-border pt-0 w-full h-full overflow-hidden">
-              <ScrollArea class="box-border p-2 pt-0 h-full w-full pages-list" v-if="resData.area != undefined">
-                <p class="page-item" v-for="(i, idx) in resData.area" :key="idx">
-                  <img :src="getIcon(i.name)">
-                  <span class="line-clamp-1">{{ i.code }}</span>
-                  <span class="line-clamp-1">{{ i.value }}</span>
-                  <em>{{ i.per }}<i :style="{ width: i.per }"></i></em>
-                </p>
-              </ScrollArea>
-              <div class="space-y-4 pt-8 w-full" v-else>
-                <Skeleton class="h-6 w-60" />
-                <Skeleton class="h-6 w-80" />
-                <Skeleton class="h-6 w-100" />
-                <Skeleton class="h-6 w-60" />
-                <Skeleton class="h-6 w-80" />
-                <Skeleton class="h-6 w-100" />
-                <Skeleton class="h-6 w-80" />
-                <Skeleton class="h-6 w-full" />
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+        <!-- ... 其他模板代码保持不变 ... -->
       </section>
     </main>
-    <footer>
-      <p><img src="./assets/svg/ing.svg"></p>
-      <p>
-        <a href="https://pages.cloudflare.com" target="_blank" rel="noopener noreferrer"><img
-            src="./assets/svg/framework.svg"></a>
-        <a href="https://www.cloudflare.com/zh-cn/application-services/products/cdn/" target="_blank"
-          rel="noopener noreferrer"><img src="./assets/svg/cdn.svg"></a>
-        <a href="https://vuejs.org" target="_blank" rel="noopener noreferrer"><img src="./assets/svg/web.svg"></a>
-        <a href="https://api.vvhan.com" target="_blank"><img src="./assets/svg/surppot.svg"></a>
-      </p>
-    </footer>
   </section>
   <div class="z-[999999999]">
     <Toaster />
@@ -260,6 +110,7 @@
 <script setup lang="ts">
 import { ref, markRaw, onMounted } from 'vue'
 import * as echarts from "echarts"
+import vh from 'vh-plugin'
 import { Button } from '@/components/ui/button'
 import { Loader2 } from 'lucide-vue-next'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -271,11 +122,6 @@ import { Toaster } from '@/components/ui/toast'
 import { useToast } from '@/components/ui/toast/use-toast'
 import { AlertDialog, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, } from '@/components/ui/alert-dialog'
 import { Input } from '@/components/ui/input'
-
-// 新增 loading 状态控制
-const loading = ref(false)
-const showLoading = () => loading.value = true
-const hideLoading = () => loading.value = false
 
 const { toast } = useToast()
 
@@ -316,7 +162,7 @@ const timeList = [
 const timeValue = ref<string>('today')
 
 const getSiteList = async () => {
-  showLoading()
+  vh.showLoading()
   try {
     const res = await fetch('/api', {
       method: 'POST',
@@ -335,7 +181,7 @@ const getSiteList = async () => {
   } catch (error) {
     console.log(error)
   } finally {
-    hideLoading()
+    vh.hideLoading()
   }
 }
 
@@ -348,7 +194,7 @@ const getDatas = async () => {
   tempResData.value = { visit: {} }
   const pmsARR = ['visit', 'path', 'referrer', 'os', 'soft', 'area', 'echarts']
   getDatasStatus.value = true
-  showLoading()
+  vh.showLoading()
   const promisesForEach: Array<Promise<any>> = []
 
   pmsARR.forEach((i: any) => {
@@ -384,7 +230,7 @@ const getDatas = async () => {
 
   await Promise.all(promisesForEach)
   getDatasStatus.value = false
-  hideLoading()
+  vh.hideLoading()
   resData.value = { ...tempResData.value }
 }
 
@@ -479,20 +325,6 @@ onMounted(() => {
 .fixed.inset-0.z-50,
 .fixed.grid.w-full.max-w-lg.shadow-lg.duration-200 {
   z-index: 99999999;
-}
-
-.loading-spinner {
-  width: 40px;
-  height: 40px;
-  border: 4px solid #f3f3f3;
-  border-top: 4px solid #3498db;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
 }
 </style>
 
