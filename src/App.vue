@@ -1,4 +1,9 @@
 <template>
+  <!-- 新增加载状态组件 -->
+  <div v-if="loading" class="fixed inset-0 z-[999999] flex items-center justify-center bg-black/50">
+    <div class="loading-spinner"></div>
+  </div>
+
   <section class="han_analytics">
     <header>
       <div class="main">
@@ -192,7 +197,6 @@
             </CardContent>
           </Card>
 
-
           <Card class="box-border flex flex-col w-full h-[460px] overflow-hidden">
             <CardHeader>
               <CardTitle>Areas</CardTitle>
@@ -253,10 +257,9 @@
   </AlertDialog>
 </template>
 
-
 <script setup lang="ts">
 import { ref, markRaw, onMounted } from 'vue'
-import * as echarts from "echarts";
+import * as echarts from "echarts"
 import { Button } from '@/components/ui/button'
 import { Loader2 } from 'lucide-vue-next'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -264,115 +267,139 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue, } from '@/components/ui/select'
 import { Alert, AlertDescription } from '@/components/ui/alert'
-import vh from 'vh-plugin'
 import { Toaster } from '@/components/ui/toast'
 import { useToast } from '@/components/ui/toast/use-toast'
-const { toast } = useToast();
-// 弹窗
 import { AlertDialog, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, } from '@/components/ui/alert-dialog'
 import { Input } from '@/components/ui/input'
 
-// 登录
+// 新增 loading 状态控制
+const loading = ref(false)
+const showLoading = () => loading.value = true
+const hideLoading = () => loading.value = false
+
+const { toast } = useToast()
+
+// 登录相关
 const authStatus = ref<boolean>(false)
 const session = ref<string>(localStorage.getItem('session') || '')
 const loginStatus = ref<boolean>(false)
 const loginPassword = ref<string>('')
 const loginFn = async () => {
-  if (!loginPassword.value) return toast({ description: '请输入密码', variant: 'destructive' });
-  loginStatus.value = true;
-  const res = await fetch('/api', { method: 'POST', headers: { 'Content-Type': 'application/json', }, body: JSON.stringify({ type: 'Login', session: loginPassword.value }) })
+  if (!loginPassword.value) return toast({ description: '请输入密码', variant: 'destructive' })
+  loginStatus.value = true
+  const res = await fetch('/api', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ type: 'Login', session: loginPassword.value })
+  })
   await new Promise(resolve => setTimeout(resolve, 666))
-  loginStatus.value = false;
+  loginStatus.value = false
   const data = await res.json()
-  if (!data.success) return toast({ description: data.message, variant: 'destructive' });
+  if (!data.success) return toast({ description: data.message, variant: 'destructive' })
   localStorage.setItem('session', loginPassword.value)
   session.value = loginPassword.value
-  authStatus.value = false;
-  // 站点列表
+  authStatus.value = false
   getSiteList()
 }
 
-// 站点列表
+// 站点列表相关
 const siteList = ref<Array<string>>([])
 const siteValue = ref<string>('')
-const timeList = [{ name: 'Today', value: 'today' }, { name: 'Yesterday', value: '1d' }, { name: 'Last 7 days', value: '7d' }, { name: 'Last 30 days', value: '30d' }, { name: 'Last 60 days', value: '60d' }, { name: 'Last 90 days', value: '90d' }]
+const timeList = [
+  { name: 'Today', value: 'today' },
+  { name: 'Yesterday', value: '1d' },
+  { name: 'Last 7 days', value: '7d' },
+  { name: 'Last 30 days', value: '30d' },
+  { name: 'Last 60 days', value: '60d' },
+  { name: 'Last 90 days', value: '90d' }
+]
 const timeValue = ref<string>('today')
+
 const getSiteList = async () => {
-  vh.showLoading()
+  showLoading()
   try {
-    const res = await fetch('/api', { method: 'POST', headers: { 'Content-Type': 'application/json', }, body: JSON.stringify({ type: 'list', session: session.value }) })
+    const res = await fetch('/api', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ type: 'list', session: session.value })
+    })
     const data = await res.json()
     if (data.code && data.code === 401) {
       localStorage.clear()
       authStatus.value = true
     }
-    if (!data.success) return toast({ description: data.message, variant: 'destructive' });
-    siteList.value = data.data;
+    if (!data.success) return toast({ description: data.message, variant: 'destructive' })
+    siteList.value = data.data
     siteValue.value = siteList.value[0]
     if (siteValue.value) getDatas()
   } catch (error) {
-    console.log(error);
+    console.log(error)
   } finally {
-    vh.hideLoading()
+    hideLoading()
   }
 }
 
-// 获取数据
+// 获取数据相关
 const resData = ref<any>({ visit: {} })
 const tempResData = ref<any>({ visit: {} })
 const getDatasStatus = ref<boolean>(false)
 const getDatas = async () => {
-  // 清空数据
   resData.value = { visit: {} }
   tempResData.value = { visit: {} }
-  // 获取数据
-  const pmsARR = ['visit', 'path', 'referrer', 'os', 'soft', 'area', 'echarts'];
+  const pmsARR = ['visit', 'path', 'referrer', 'os', 'soft', 'area', 'echarts']
   getDatasStatus.value = true
-  vh.showLoading()
-  const promisesForEach: Array<Promise<any>> = [];
+  showLoading()
+  const promisesForEach: Array<Promise<any>> = []
+
   pmsARR.forEach((i: any) => {
     const p = new Promise((r) => {
       (async () => {
         try {
           const pms = { type: i, siteID: siteValue.value, time: timeValue.value, session: session.value }
-          const res = await fetch('/api', { method: 'POST', headers: { 'Content-Type': 'application/json', }, body: JSON.stringify(pms) })
+          const res = await fetch('/api', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(pms)
+          })
           const data = await res.json()
           if (data.code && data.code === 401) {
             localStorage.clear()
-            authStatus.value = true;
+            authStatus.value = true
           }
-          if (!data.success) return toast({ description: data.message, variant: 'destructive' });
-          tempResData.value[i] = i == 'echarts' ? renderEcharts(data.data.map((i: any) => `${i.name}${['today', '1d'].includes(timeValue.value) ? '点' : '日'}`), data.data.map((i: any) => `${i.value}`)) : data.data
+          if (!data.success) return toast({ description: data.message, variant: 'destructive' })
+          tempResData.value[i] = i == 'echarts' ?
+            renderEcharts(
+              data.data.map((i: any) => `${i.name}${['today', '1d'].includes(timeValue.value) ? '点' : '日'}`),
+              data.data.map((i: any) => `${i.value}`)
+            ) : data.data
         } catch (error) {
-          console.log(error);
+          console.log(error)
         } finally {
-          // Promise执行完毕触发
-          r(true);
+          r(true)
         }
-      })();
-    });
-    promisesForEach.push(p);
+      })()
+    })
+    promisesForEach.push(p)
   })
-  await Promise.all(promisesForEach);
-  getDatasStatus.value = false;
-  vh.hideLoading()
-  // 渲染数据
+
+  await Promise.all(promisesForEach)
+  getDatasStatus.value = false
+  hideLoading()
   resData.value = { ...tempResData.value }
 }
 
-// 获取ICON
+// 工具函数
 const getIconUrl = (url: string) => {
   if (!url) return 'https://icons.duckduckgo.com/ip3/none.ico'
   const _url = new URL(url)
   return `https://icons.duckduckgo.com/ip3/${_url.hostname}.ico`
 }
 
-// 获取Area ICON
 const getIcon = (code: string) => `${location.origin}/icon/${code}.png`
 
-// 渲染图表
-const echartsDOM = ref<HTMLCanvasElement>();
-const canvasMain = ref<any>();
+// Echarts 相关
+const echartsDOM = ref<HTMLCanvasElement>()
+const canvasMain = ref<any>()
 const renderEcharts = async (dateList: Array<any>, valueList: Array<any>) => {
   const option = {
     grid: { left: "0", right: "0", bottom: "0", top: "10", containLabel: true },
@@ -437,22 +464,35 @@ const renderEcharts = async (dateList: Array<any>, valueList: Array<any>) => {
         }
       }
     ]
-  };
-  canvasMain.value.setOption(option);
-};
+  }
+  canvasMain.value.setOption(option)
+}
 
 onMounted(() => {
-  //   图表
-  canvasMain.value = markRaw(echarts.init(echartsDOM.value, null, { renderer: "svg", useDirtyRect: true }));
-  window.addEventListener("resize", canvasMain.value.resize);
-  // 站点列表
+  canvasMain.value = markRaw(echarts.init(echartsDOM.value, null, { renderer: "svg", useDirtyRect: true }))
+  window.addEventListener("resize", canvasMain.value.resize)
   getSiteList()
 })
 </script>
+
 <style>
 .fixed.inset-0.z-50,
 .fixed.grid.w-full.max-w-lg.shadow-lg.duration-200 {
   z-index: 99999999;
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #3498db;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 </style>
 
