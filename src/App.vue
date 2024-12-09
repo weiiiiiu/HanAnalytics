@@ -1,19 +1,26 @@
 <template>
+  <!-- 新增加载状态组件 -->
+  <div v-if="loading" class="fixed inset-0 z-[999999] flex items-center justify-center bg-black/50">
+    <div class="loading-spinner"></div>
+  </div>
+
   <section class="han_analytics">
     <header>
       <div class="main">
         <div class="logo">
           <img src="./assets/favicon.ico">
-          <span>Web Analytics</span>
+          <span>Han Analytics</span>
         </div>
-        <h2>Web分析</h2>
+        <h2>简单优雅的Web分析</h2>
       </div>
     </header>
     <main>
       <header>
         <Alert>
           <AlertDescription>
-            <p style="font-weight: bold;">· 开源地址: <a class="git-link" href="https://github.com/weiiiiiu/HanAnalytics"
+            <p>· Han Analytics 是一个简单的网络分析跟踪器和仪表板，托管在被称为赛博菩萨的 Cloudflare 上,无成本稳定运行,每天可达10万次免费统计。</p>
+            <p>· 域名、服务器、数据库 通通都不用! 托管在 Cloudflare Pages 上即可快速部署网站分析仪表板。</p>
+            <p style="font-weight: bold;">· 开源地址: <a class="git-link" href="https://github.com/uxiaohan/HanAnalytics"
                 target="_blank">Han-Analytics</a>
             </p>
           </AlertDescription>
@@ -251,7 +258,6 @@
 </template>
 
 <script setup lang="ts">
-  @ts-nocheck
 import { ref, markRaw, onMounted } from 'vue'
 import * as echarts from "echarts"
 import { Button } from '@/components/ui/button'
@@ -265,7 +271,11 @@ import { Toaster } from '@/components/ui/toast'
 import { useToast } from '@/components/ui/toast/use-toast'
 import { AlertDialog, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, } from '@/components/ui/alert-dialog'
 import { Input } from '@/components/ui/input'
-import vh from 'vh-plugin'
+
+// 新增 loading 状态控制
+const loading = ref(false)
+const showLoading = () => loading.value = true
+const hideLoading = () => loading.value = false
 
 const { toast } = useToast()
 
@@ -306,7 +316,7 @@ const timeList = [
 const timeValue = ref<string>('today')
 
 const getSiteList = async () => {
-  vh.showLoading()
+  showLoading()
   try {
     const res = await fetch('/api', {
       method: 'POST',
@@ -325,7 +335,7 @@ const getSiteList = async () => {
   } catch (error) {
     console.log(error)
   } finally {
-    vh.hideLoading()
+    hideLoading()
   }
 }
 
@@ -338,7 +348,7 @@ const getDatas = async () => {
   tempResData.value = { visit: {} }
   const pmsARR = ['visit', 'path', 'referrer', 'os', 'soft', 'area', 'echarts']
   getDatasStatus.value = true
-  vh.showLoading()
+  showLoading()
   const promisesForEach: Array<Promise<any>> = []
 
   pmsARR.forEach((i: any) => {
@@ -374,7 +384,7 @@ const getDatas = async () => {
 
   await Promise.all(promisesForEach)
   getDatasStatus.value = false
-  vh.hideLoading()
+  hideLoading()
   resData.value = { ...tempResData.value }
 }
 
@@ -469,6 +479,20 @@ onMounted(() => {
 .fixed.inset-0.z-50,
 .fixed.grid.w-full.max-w-lg.shadow-lg.duration-200 {
   z-index: 99999999;
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #3498db;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 </style>
 
