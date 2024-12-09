@@ -13,8 +13,14 @@ export default defineConfig({
   plugins: [vue()],
   resolve: { 
     alias: { 
-      '@': fileURLToPath(new URL('./src', import.meta.url)) 
+      '@': fileURLToPath(new URL('./src', import.meta.url)),
+      'vh-plugin': 'vh-plugin'  // 添加这行
     } 
+  },
+  build: {
+    rollupOptions: {
+      external: ['vh-plugin']  // 添加这行
+    }
   },
   server: { 
     host: '0.0.0.0', 
