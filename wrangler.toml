@@ -11,4 +11,4 @@ CLOUDFLARE_API_TOKEN = '41IR7TZLCua8MMWvLXxlWV6D1i_rAPeCa3c9SUCc'
 # 网站访问密码 (不设置即无需密码访问)
 CLOUDFLARE_WEBSITE_PWD = ''
 # 可统计的白名单 格式：  域名,WebSite|域名,WebSite，多个站点使用|分隔 例如：'api.vvhan.com,Hello-Han-Api|www.vvhan.com,Hello-HanHexoBlog'  (不设置即允许任何统计)
-CLOUDFLARE_WEBSITE_WHITELIST = ''
+CLOUDFLARE_WEBSITE_WHITELIST = 'worker.weii.us.kg,worker-vless|zyxyx.me,Blinko,cloud.geniuse.me|cloud,nezha.geniuse.me,nezha'
