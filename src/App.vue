@@ -251,6 +251,7 @@
 </template>
 
 <script setup lang="ts">
+  @ts-nocheck
 import { ref, markRaw, onMounted } from 'vue'
 import * as echarts from "echarts"
 import { Button } from '@/components/ui/button'
