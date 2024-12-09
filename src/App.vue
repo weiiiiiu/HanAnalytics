@@ -1,9 +1,4 @@
 <template>
-  <!-- 新增加载状态组件 -->
-  <div v-if="loading" class="fixed inset-0 z-[999999] flex items-center justify-center bg-black/50">
-    <div class="loading-spinner"></div>
-  </div>
-
   <section class="han_analytics">
     <header>
       <div class="main">
@@ -269,11 +264,7 @@ import { Toaster } from '@/components/ui/toast'
 import { useToast } from '@/components/ui/toast/use-toast'
 import { AlertDialog, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, } from '@/components/ui/alert-dialog'
 import { Input } from '@/components/ui/input'
-
-// 新增 loading 状态控制
-const loading = ref(false)
-const showLoading = () => loading.value = true
-const hideLoading = () => loading.value = false
+import vh from 'vh-plugin'
 
 const { toast } = useToast()
 
@@ -314,7 +305,7 @@ const timeList = [
 const timeValue = ref<string>('today')
 
 const getSiteList = async () => {
-  showLoading()
+  vh.showLoading()
   try {
     const res = await fetch('/api', {
       method: 'POST',
@@ -333,7 +324,7 @@ const getSiteList = async () => {
   } catch (error) {
     console.log(error)
   } finally {
-    hideLoading()
+    vh.hideLoading()
   }
 }
 
@@ -346,7 +337,7 @@ const getDatas = async () => {
   tempResData.value = { visit: {} }
   const pmsARR = ['visit', 'path', 'referrer', 'os', 'soft', 'area', 'echarts']
   getDatasStatus.value = true
-  showLoading()
+  vh.showLoading()
   const promisesForEach: Array<Promise<any>> = []
 
   pmsARR.forEach((i: any) => {
@@ -382,7 +373,7 @@ const getDatas = async () => {
 
   await Promise.all(promisesForEach)
   getDatasStatus.value = false
-  hideLoading()
+  vh.hideLoading()
   resData.value = { ...tempResData.value }
 }
 
@@ -477,20 +468,6 @@ onMounted(() => {
 .fixed.inset-0.z-50,
 .fixed.grid.w-full.max-w-lg.shadow-lg.duration-200 {
   z-index: 99999999;
-}
-
-.loading-spinner {
-  width: 40px;
-  height: 40px;
-  border: 4px solid #f3f3f3;
-  border-top: 4px solid #3498db;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
 }
 </style>
 
